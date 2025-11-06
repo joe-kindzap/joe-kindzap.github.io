@@ -128,9 +128,10 @@ async function getUserConfig(userId) {
 }
 
 /**
+ * *** FIX: Renamed this function from initializeApp to startApp ***
  * The main "boot-up" function for the app.
  */
-async function initializeApp() {
+async function startApp() {
   try {
     // 1. Sign in
     updateAuthStatus(`Connecting...`);
@@ -413,5 +414,5 @@ generateBtn.addEventListener('click', handleComplimentRequest);
 upgradeBtn.addEventListener('click', handleUpgradeRequest);
 closePaywallBtn.addEventListener('click', () => showPaywall(false));
 
-// Call the main boot function
-initializeApp();
+// *** FIX: Call our renamed startApp function ***
+startApp();
