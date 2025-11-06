@@ -18,7 +18,7 @@ export default async function handler(request, response) {
   // We use `request.json()` instead of `request.body` for Vercel.
   let userQuery, systemPrompt;
   try {
-    const body = await request.json();
+    const body = request.body;
     userQuery = body.userQuery;
     systemPrompt = body.systemPrompt;
   } catch (error) {
