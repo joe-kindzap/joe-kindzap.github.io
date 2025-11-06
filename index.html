@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KindZap.com - AI Compliments</title>
+    <!-- 
+      This script loads Tailwind CSS, which is a utility-first CSS framework.
+      It lets us style our website quickly without writing custom CSS files.
+      We're using it to make our app look modern and clean.
+    -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* This is a simple animation for our loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6; /* blue-600 */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <!-- 
+      This is the main "card" for our app.
+      'bg-white', 'p-8', 'rounded-2xl', 'shadow-xl' are Tailwind classes for styling.
+    -->
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg">
+        
+        <!-- Header Section -->
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">
+            ⚡ KindZap.com
+        </h1>
+        <p class="text-center text-gray-500 mb-6">
+            Get an instant boost of kindness, powered by AI.
+        </p>
+
+        <!-- 
+          Status Bar
+          This is where we'll show the user their ID and plan status.
+        -->
+        <div class="bg-gray-50 p-3 rounded-lg mb-6 text-sm text-gray-600">
+            <p id="auth-status">Connecting to server...</p>
+            <p id="style-status" class="mt-1">Loading your plan...</p>
+        </div>
+
+        <!-- 
+          Input Area
+          This is where the user types what's on their mind.
+        -->
+        <div class="mb-4">
+            <label for="user-input" class="block text-sm font-medium text-gray-700 mb-2">
+                What's on your mind? (e.g., "I finished a big project")
+            </label>
+            <textarea id="user-input" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="I just..."></textarea>
+        </div>
+
+        <!-- 
+          PHASE 3: Style Selector
+          This dropdown lets the user choose their compliment style.
+          Premium styles are 'disabled' by default and unlocked for 'pro' users.
+        -->
+        <div class="mb-6">
+            <label for="style-selector" class="block text-sm font-medium text-gray-700 mb-2">
+                Choose your compliment style:
+            </label>
+            <select id="style-selector" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="witty">Witty (Free)</option>
+                <option value="wholesome">Wholesome (Free)</option>
+                
+                <!-- Premium styles -->
+                <option value="shakespeare" disabled>Shakespearean (Pro)</option>
+                <option value="gen_z" disabled>Gen Z (Pro)</option>
+                <option value="business" disabled>Corporate (Pro)</option>
+            </select>
+        </div>
+        <!-- --- END PHASE 3 --- -->
+
+        <!-- 
+          Action Button
+          The main button to get a compliment. It's 'disabled' until the app is ready.
+        -->
+        <button id="generate-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center" disabled>
+            <span id="btn-spinner" class="spinner mr-3 hidden"></span>
+            <span id="btn-text">Loading App...</span>
+        </button>
+
+        <!-- 
+          Output Area
+          This section is 'hidden' by default and will appear with the result.
+        -->
+        <div id="output-container" class="mt-6 hidden">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Your Compliment:</h2>
+            <div id="output-text" class="bg-blue-50 p-4 border border-blue-200 rounded-lg text-gray-700">
+                <!-- AI-generated compliment will go here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+      PHASE 1: Paywall Modal 
+      This is the pop-up for upgrading. It's 'hidden' by default.
+      'fixed inset-0' makes it cover the whole screen.
+      'z-50' makes sure it's on top of everything else.
+    -->
+    <div id="paywall" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+        <!-- The white modal box -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Upgrade to Pro!</h2>
+            <p class="text-gray-600 mb-6">You've used all your free compliments. Upgrade to Pro to get unlimited compliments and premium styles.</p>
+            
+            <!-- Feature List -->
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center">
+                    <svg class="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span class="text-gray-700">Unlimited Compliments</span>
+                </li>
+                <li class="flex items-center">
+                    <svg class="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span class="text-gray-700">Access to Premium Styles</span>
+                </li>
+                <li class="flex items-center">
+                    <svg class="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span class="text-gray-700">Support a Happy Dev</span>
+                </li>
+            </ul>
+            
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <button id="upgrade-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Upgrade Now ($5/mo)
+                </button>
+                <button id="close-paywall-btn" class="w-full bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg hover:bg-gray-300 transition duration-300">
+                    Maybe Later
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- --- END PHASE 1 --- -->
+
+
+    <!-- 
+      JavaScript and Firebase Logic
+      We use 'type="module"' to be able to use 'import' statements.
+    -->
+    <script type="module">
+        // Import Firebase modules. These URLs are from Google's official CDN.
+        // We need 'app' for general setup.
+        // We need 'auth' to sign users in (even anonymously).
+        // We need 'firestore' for our "Magic Notebook" (the database).
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        /*
+         * =========================================================================
+         * POSTHOG ANALYTICS SNIPPET (PHASE 4)
+         * =========================================================================
+         * This is where you would paste your PostHog snippet.
+         * For this demo, we'll use a placeholder object so the code doesn't break
+         * before we get to Phase 4. This is a common practice.
+         */
+        
+        // A placeholder 'posthog' object.
+        // This ensures that calls like 'posthog.capture()' don't cause an error
+        // before PostHog is actually loaded.
+        const posthog = {
+            identify: (userId, properties) => {
+                console.log(`[PostHog Placeholder] Identify User: ${userId}`, properties);
+            },
+            capture: (eventName, properties) => {
+                console.log(`[PostHog Placeholder] Capture Event: ${eventName}`, properties);
+            },
+            people: {
+                set: (properties) => {
+                    console.log(`[PostHog Placeholder] Set People Properties:`, properties);
+                }
+            }
+        };
+
+        /*
+         * =========================================================================
+         * APP CONFIGURATION AND STATE
+         * =========================================================================
+         */
+
+        // --- System Prompts for AI ---
+        // This object holds the different "personalities" for our AI.
+        const PROMPTS = {
+            // Free Styles
+            witty: "You are a witty, slightly sarcastic, but ultimately very supportive friend. Generate a compliment that is clever and funny, based on the user's input.",
+            wholesome: "You are a warm, empathetic, and wholesome friend. Generate a sincere, kind, and uplifting compliment based on the user's input. Be very encouraging.",
+            
+            // --- PHASE 3: Premium Styles ---
+            shakespeare: "You are Shakespeare. Generate a compliment in elegant, flowery, iambic-pentameter-style prose based on the user's input. Use words like 'thou', 'hath', and 'verily'.",
+            gen_z: "You are a Gen Z TikToker. Generate a compliment that is 'for the moment' based on the user's input. Use modern slang. No cap, make it hit different. Bet.",
+            business: "You are a business professional in a suit. Generate a compliment that sounds like corporate buzzwords. Synergize the user's input into a value-add statement."
+        };
+        
+        // --- DOM Elements ---
+        // We grab all our HTML elements by their ID so we can control them.
+        const authStatus = document.getElementById('auth-status');
+        const styleStatus = document.getElementById('style-status');
+        const generateBtn = document.getElementById('generate-btn');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const btnText = document.getElementById('btn-text');
+        const userInput = document.getElementById('user-input');
+        const outputContainer = document.getElementById('output-container');
+        const outputText = document.getElementById('output-text');
+        
+        // Phase 1 DOM Elements
+        const paywall = document.getElementById('paywall');
+        const closePaywallBtn = document.getElementById('close-paywall-btn');
+        
+        // Phase 2 DOM Element
+        const upgradeBtn = document.getElementById('upgrade-btn'); 
+        
+        // Phase 3 DOM Element
+        const styleSelector = document.getElementById('style-selector');
+
+        // --- Firebase Config and Init ---
+        // These are global variables provided by the environment we're in.
+        // When you host this yourself, you'll replace these with your own keys
+        // from your Firebase project.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase App and services
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app); // This is our "Magic Notebook"
+
+        // --- Global State Variables ---
+        // These variables hold our app's "memory" while the user is on the page.
+        let state = {
+            isLoading: false,
+            isAuthReady: false,
+        };
+        let currentUserId = null;
+        let currentUserStyle = 'wholesome'; // Default style
+        let userPlan = 'free';              // Default plan
+        let complimentCount = 0;            // Default count
+
+        
+        /*
+         * =========================================================================
+         * APP INITIALIZATION (The "Boot-up" Sequence)
+         * =========================================================================
+         */
+
+        // --- 1. Authentication ---
+        // This runs as soon as the page loads.
+        // It's a "listener" that fires when Firebase knows who the user is.
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in!
+                currentUserId = user.uid;
+                authStatus.textContent = `Your User ID: ${currentUserId.substring(0, 8)}...`;
+                
+                // Now that we know *who* the user is, we can get their data.
+                await getUserConfig();
+                
+                state.isAuthReady = true;
+                
+                // --- POSTHOG (PHASE 4): Identify User ---
+                // This tells PostHog who the user is.
+                posthog.identify(currentUserId, {
+                    // You can add properties you know about the user here
+                });
+                
+                // Enable the main button now that we're ready
+                generateBtn.disabled = false;
+                btnText.textContent = "Get Compliment";
+                
+            } else {
+                // No user. We should sign them in.
+                // This is how we get a 'currentUserId' for new visitors.
+                signInAnonymously(auth).catch(err => {
+                    console.error("Anonymous sign-in failed:", err);
+                    authStatus.textContent = "Error: Could not connect to user service.";
+                });
+            }
+        });
+
+        // This attempts to sign in. 
+        // If 'initialAuthToken' exists, it uses that. Otherwise, it triggers the
+        // 'onAuthStateChanged' listener which will then sign in anonymously.
+        async function initialSignIn() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+                // The onAuthStateChanged listener will handle the rest
+            } catch (error) {
+                console.error("Initial sign-in error:", error);
+                authStatus.textContent = "Error: Authentication failed.";
+            }
+        }
+
+        // --- 2. Get User Configuration ---
+        // This is where we read from our "Magic Notebook" (Firestore).
+        async function getUserConfig() {
+            if (!currentUserId) return;
+
+            // This is the "page" in our notebook for this user's config.
+            const configRef = doc(db, `artifacts/${appId}/users/${currentUserId}/config`, 'main');
+            
+            try {
+                const docSnap = await getDoc(configRef);
+
+                if (docSnap.exists()) {
+                    // --- Returning User ---
+                    const config = docSnap.data();
+                    userPlan = config.plan || 'free';
+                    currentUserStyle = config.style || (Math.random() < 0.5 ? 'witty' : 'wholesome');
+                    complimentCount = config.complimentCount || 0;
+                    
+                } else {
+                    // --- New User ---
+                    // They have no "page" yet, so we create one for them.
+                    currentUserStyle = Math.random() < 0.5 ? 'witty' : 'wholesome';
+                    userPlan = 'free';
+                    complimentCount = 0;
+                    
+                    await setDoc(configRef, {
+                        plan: userPlan,
+                        style: currentUserStyle,
+                        complimentCount: complimentCount,
+                        assignedAt: serverTimestamp()
+                    });
+                }
+                
+                // Update UI with all config data
+                styleStatus.textContent = `Style Group: ${currentUserStyle} (Plan: ${userPlan}) (Count: ${complimentCount})`;
+                
+                // --- POSTHOG (PHASE 4): SET USER PROPERTIES ---
+                // This tells PostHog properties about the user, like their plan.
+                posthog.people.set({
+                    plan: userPlan,
+                    assigned_style: currentUserStyle
+                });
+                
+                // --- PHASE 3: Unlock Pro Features ---
+                // 1. Set the dropdown's default value to their assigned style.
+                if (styleSelector) {
+                    styleSelector.value = currentUserStyle;
+                }
+
+                // 2. If the user is 'pro', unlock the premium styles.
+                if (userPlan === 'pro' && styleSelector) {
+                    styleSelector.querySelectorAll('option').forEach(option => {
+                        if (['shakespeare', 'gen_z', 'business'].includes(option.value)) {
+                            option.disabled = false; // ...unlock it!
+                        }
+                    });
+                }
+                // --- END PHASE 3 ---
+                
+            } catch (error) {
+                console.error("Error getting user config:", error);
+                styleStatus.textContent = "Error loading user plan.";
+            }
+        }
+        
+        
+        /*
+         * =========================================================================
+         * APP CORE LOGIC (Event Handlers)
+         * =========================================================================
+         */
+
+        // --- 3. Handle Compliment Generation ---
+        generateBtn.addEventListener('click', handleComplimentRequest);
+
+        async function handleComplimentRequest() {
+            if (state.isLoading || !state.isAuthReady) return;
+
+            // --- PHASE 1: GATEKEEPER ---
+            // Check user's plan and count BEFORE doing anything.
+            if (userPlan === 'free' && complimentCount >= 3) {
+                showPaywall(true);    // Show the modal
+                setLoading(false);    // Stop the spinner
+                return;               // IMPORTANT: Stop the function here.
+            }
+            // --- END PHASE 1 ---
+
+            const query = userInput.value.trim();
+            if (!query) {
+                outputText.textContent = "Please tell me a little something first!";
+                outputContainer.classList.remove('hidden');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                // --- PHASE 3: Get style from dropdown ---
+                // We read the *selected* value from the dropdown, not just the user's
+                // default assigned style.
+                const selectedStyle = styleSelector.value;
+                const systemPrompt = PROMPTS[selectedStyle];
+                
+                if (!systemPrompt) {
+                    throw new Error(`Invalid style selected: ${selectedStyle}`);
+                }
+                // --- END PHASE 3 ---
+                
+                // --- 4. Call Gemini API ---
+                const compliment = await callGeminiApi(query, systemPrompt);
+                
+                // Display result
+                outputText.textContent = compliment;
+                outputContainer.classList.remove('hidden');
+
+                // --- POSTHOG (PHASE 4): CAPTURE EVENT ---
+                // This is our core "activation" event.
+                posthog.capture('compliment_generated', {
+                    style: selectedStyle,
+                    plan: userPlan,
+                    query_length: query.length
+                });
+                
+                // --- PHASE 1: COUNTER ---
+                // If the call was successful, update the count for free users.
+                if (userPlan === 'free') {
+                    complimentCount++; // 1. Increment local count
+                    
+                    // 2. Save to Firebase "Magic Notebook"
+                    const configRef = doc(db, `artifacts/${appId}/users/${currentUserId}/config`, 'main');
+                    await setDoc(configRef, { 
+                        complimentCount: complimentCount 
+                    }, { merge: true }); // 'merge: true' is crucial.
+                                       // It only updates this one field.
+
+                    // 3. Update UI
+                    styleStatus.textContent = `Style Group: ${currentUserStyle} (Plan: ${userPlan}) (Count: ${complimentCount})`;
+                }
+                // --- END PHASE 1 ---
+
+            } catch (error) {
+                console.error("Error from Gemini API:", error);
+                outputText.textContent = "Sorry, I'm feeling a bit uninspired. Please try again. " + error.message;
+                outputContainer.classList.remove('hidden');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // --- PHASE 2: Handle Upgrade ---
+        // This is the listener for our "Upgrade Now" button.
+        upgradeBtn.addEventListener('click', handleUpgradeRequest);
+
+        async function handleUpgradeRequest() {
+            // 1. Show a loading state on the button
+            upgradeBtn.disabled = true;
+            upgradeBtn.textContent = "Processing payment...";
+
+            try {
+                // 2. Simulate a 1-second payment delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // 3. Update our Firebase "Magic Notebook"
+                // This is the "conversion"! We just change 'plan' to 'pro'.
+                const configRef = doc(db, `artifacts/${appId}/users/${currentUserId}/config`, 'main');
+                await setDoc(configRef, { 
+                    plan: 'pro' 
+                }, { merge: true });
+
+                // 4. Update our local variables
+                userPlan = 'pro';
+
+                // 5. Update the UI
+                styleStatus.textContent = `Style Group: ${currentUserStyle} (Plan: ${userPlan}) (Count: ${complimentCount})`;
+                
+                // --- POSTHOG (PHASE 4): CAPTURE UPGRADE EVENT ---
+                posthog.capture('upgrade_success', { plan: 'pro' });
+                // We also update the user's "profile" in PostHog.
+                posthog.people.set({ plan: 'pro' });
+
+                // 6. Hide the paywall
+                showPaywall(false);
+
+                // --- PHASE 3: Unlock features *immediately* after upgrading ---
+                if (styleSelector) {
+                    styleSelector.querySelectorAll('option').forEach(option => {
+                        if (['shakespeare', 'gen_z', 'business'].includes(option.value)) {
+                            option.disabled = false;
+                        }
+                    });
+                }
+                // --- END PHASE 3 ---
+
+            } catch (error) {
+                console.error("Error upgrading plan:", error);
+                upgradeBtn.textContent = "Error! Please try again.";
+            } finally {
+                // 7. Reset the button (in case of error)
+                if (upgradeBtn) {
+                    upgradeBtn.disabled = false;
+                    upgradeBtn.textContent = "Upgrade Now ($5/mo)";
+                }
+            }
+        }
+        
+        // This listener is for the "Maybe Later" button on the paywall.
+        closePaywallBtn.addEventListener('click', () => showPaywall(false));
+
+
+        /*
+         * =========================================================================
+         * HELPER FUNCTIONS
+         * =========================================================================
+         */
+
+        // --- Helper: Set Loading State ---
+        // This function just controls the spinner and button text.
+        function setLoading(isLoading) {
+            state.isLoading = isLoading;
+            generateBtn.disabled = isLoading;
+            if (isLoading) {
+                btnSpinner.classList.remove('hidden');
+                btnText.textContent = "Generating...";
+            } else {
+                btnSpinner.classList.add('hidden');
+                btnText.textContent = "Get Compliment";
+            }
+        }
+
+        // --- Phase 1 Helper: Paywall Show/Hide Function ---
+        function showPaywall(show = true) {
+            if (show) {
+                paywall.classList.remove('hidden');
+            } else {
+                paywall.classList.add('hidden');
+            }
+        }
+
+        // --- Helper: Call Gemini API ---
+        // This is the function that actually talks to the AI.
+        async function callGeminiApi(userQuery, systemPrompt, retries = 3, delay = 1000) {
+            // Note: The 'apiKey' and 'apiUrl' are provided by the environment.
+            // When you host this yourself, you'll need your own Gemini API key.
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+            };
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    // Extract the text from the response
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        return text; // Success!
+                    } else {
+                        throw new Error("No content in API response.");
+                    }
+
+                } catch (error) {
+                    console.error(`Attempt ${i + 1} failed:`, error);
+                    if (i === retries - 1) {
+                        // This was the last retry
+                        throw error; // Re-throw the last error
+                    }
+                    // Wait before retrying
+                    await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                }
+            }
+        }
+
+        // --- Start the app ---
+        // This one call kicks off the whole authentication process.
+        initialSignIn();
+
+    </script>
+</body>
+</html>
