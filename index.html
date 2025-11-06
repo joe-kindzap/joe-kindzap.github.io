@@ -111,6 +111,7 @@
       This is the magic. We load our "main" JavaScript file as a module.
       This one file will import all the other JS files it needs.
     -->
-    <script type="module" src="/app.js"></script>
+    <!-- *** THIS IS THE FIX: Load app.js from its new home inside /src/ *** -->
+    <script type="module" src="/src/app.js"></script>
 </body>
 </html>
