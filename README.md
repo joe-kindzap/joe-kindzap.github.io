@@ -1,6 +1,6 @@
 <!-- File: /README.md -->
 
-<!-- This is the root file for your project. -->
+<!-- This is the root README file for your project. -->
 
 ⚡ KindZap.com
 
@@ -20,26 +20,26 @@ Free: Choose from "Witty" or "Wholesome" styles.
 
 Pro: Unlock premium styles like "Shakespearean," "Gen Z," and "Corporate."
 
-"Best in Class" Tech Stack
+Tech Stack
 
-This app is built with a professional, modular, and secure architecture.
+This app is built with a clean, professional, and secure architecture.
 
-Frontend: The UI is a clean index.html file, styled with Tailwind CSS.
+Frontend (HTML/CSS): The entire UI, including all HTML and CSS, is contained in a single index.html file. It uses Tailwind CSS (via CDN) for modern styling.
 
-App Logic: The frontend logic is written in vanilla JavaScript (ESM) and is fully modular. It's broken down by "Separation of Concerns":
+Frontend (Logic): All frontend logic is contained in a single app.js file, which is loaded as a JavaScript Module. This includes:
 
-/app.js: The main controller that manages state and events.
+DOM manipulation
 
-/src/dom.js: A dedicated service for all UI updates.
+State management
 
-/src/firebase.js: A dedicated service for all Auth & Database logic.
+Firebase/Firestore integration
 
-/src/api.js: A dedicated service for calling our backend.
-
-/src/config.js: A central file for all configuration.
+PostHog analytics calls
 
 Backend (Database): Google Firebase (Firestore) is used to store user data, such as plan status (free/pro) and usage counts.
 
 Backend (Secure AI): We use a Vercel Serverless Function (/api/getCompliment.js) to securely call the OpenAI API. This ensures our secret API key is never exposed to the browser.
 
-Hosting: The app is designed to be hosted on Vercel, which handles the static frontend, the secure backend function, and all environment variables.
+Analytics: PostHog is integrated to capture key product events like compliment_generated, paywall_viewed, and upgrade_success.
+
+Hosting: The app is hosted on Vercel, which handles the static frontend, the secure backend function, and all secret environment variables.
