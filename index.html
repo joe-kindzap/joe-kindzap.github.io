@@ -326,10 +326,17 @@
                 
                 // --- POSTHOG (PHASE 4): SET USER PROPERTIES ---
                 // This tells PostHog properties about the user, like their plan.
-                posthog.people.set({
-                    plan: userPlan,
-                    assigned_style: currentUserStyle
-                });
+                // *** DEFENSIVE CODING ADDED ***
+                // We check if posthog.people.set is a function, as ad-blockers
+                // might prevent the full library from loading.
+                if (posthog && typeof posthog.people.set === 'function') {
+                    posthog.people.set({
+                        plan: userPlan,
+                        assigned_style: currentUserStyle
+                    });
+                } else {
+                    console.warn("PostHog library not fully loaded (likely ad-blocked). Skipping posthog.people.set.");
+                }
                 
                 // --- PHASE 3: Unlock Pro Features ---
                 // 1. Set the dropdown's default value to their assigned style.
@@ -470,8 +477,14 @@
                 
                 // --- POSTHOG (PHASE 4): CAPTURE UPGRADE EVENT ---
                 posthog.capture('upgrade_success', { plan: 'pro' });
+                
                 // We also update the user's "profile" in PostHog.
-                posthog.people.set({ plan: 'pro' });
+                // *** DEFENSIVE CODING ADDED ***
+                if (posthog && typeof posthog.people.set === 'function') {
+                    posthog.people.set({ plan: 'pro' });
+                } else {
+                    console.warn("PostHog library not fully loaded (likely ad-blocked). Skipping posthog.people.set.");
+                }
 
                 // 6. Hide the paywall
                 showPaywall(false);
