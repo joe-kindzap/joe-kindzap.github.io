@@ -1,3 +1,7 @@
+/* File: /api/getCompliment.js */
+/* This file *must* be inside a folder named "api" in the root directory. */
+/* Vercel automatically finds this and treats it as a secure backend function. */
+
 /**
  * This is our new "Serverless Function" (our tiny backend).
  * Vercel will run this file as a backend, not in the browser.
