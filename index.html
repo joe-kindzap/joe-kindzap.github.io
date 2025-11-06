@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KindZap.com - AI Compliments</title>
+
+    <!-- 
+      PHASE 4: REAL POSTHOG SNIPPET
+      This is your actual PostHog snippet, pasted in.
+    -->
+    <script>
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init fi Cr Or ci Tr Ir capture Mi calculateEventProperties Ar register register_once register_for_session unregister unregister_for_session Nr getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty jr Mr createPersonProfile Lr kr Ur opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Fr debug M Dr getPageViewId captureTraceFeedback captureTraceMetric $r".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+        posthog.init('phc_EJ70uG9mGgWmrnivJEyyAxI7VzFjSXDRVr9107i7QZM', {
+            api_host: 'https://eu.i.posthog.com',
+            defaults: '2025-05-24',
+            person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+        })
+    </script>
+    <!-- END POSTHOG SNIPPET -->
+
     <!-- 
       This script loads Tailwind CSS, which is a utility-first CSS framework.
       It lets us style our website quickly without writing custom CSS files.
-      We're using it to make our app look modern and clean.
     -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -152,30 +166,19 @@
     -->
     <script type="module">
         // Import Firebase modules. These URLs are from Google's official CDN.
-        // We need 'app' for general setup.
-        // We need 'auth' to sign users in (even anonymously).
-        // We need 'firestore' for our "Magic Notebook" (the database).
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         /*
          * =========================================================================
-         * POSTHOG ANALYTICS SNIPPET (PHASE 4)
+         * POSTHOG IS NOW LOADED IN THE <HEAD>
+         * We have deleted the old placeholder object.
+         * All calls to `posthog.capture()` etc. will now go to the REAL PostHog.
          * =========================================================================
          */
-        
-<script>
-    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init fi Cr Or ci Tr Ir capture Mi calculateEventProperties Ar register register_once register_for_session unregister unregister_for_session Nr getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty jr Mr createPersonProfile Lr kr Ur opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Fr debug M Dr getPageViewId captureTraceFeedback captureTraceMetric $r".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-    posthog.init('phc_EJ70uG9mGgWmrnivJEyyAxI7VzFjSXDRVr9107i7QZM', {
-        api_host: 'https://eu.i.posthog.com',
-        defaults: '2025-05-24',
-        person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
-    })
-</script>
 
 
-        
         /*
          * =========================================================================
          * APP CONFIGURATION AND STATE
@@ -532,15 +535,28 @@
         // This is the function that actually talks to ChatGPT.
         async function callOpenAiApi(userQuery, systemPrompt, retries = 3, delay = 1000) {
             
-            // *** PASTE YOUR CHATGPT API KEY (sk-...) HERE! ***
+            // This key MUST remain blank on GitHub for security.
+            // We will now check for this and return "dummy data" if it's blank.
             const openAiApiKey = ""; 
             const apiUrl = "https://api.openai.com/v1/chat/completions";
 
+            // --- NEW "DUMMY DATA" LOGIC ---
+            // If the API key is blank (which it is on GitHub), return a fake compliment.
+            // This ensures the app works on the live site for PostHog testing.
             if (!openAiApiKey) {
-                throw new Error("Missing OpenAI API Key. Please add it to index.html on line 551.");
+                console.log("No API Key found. Returning dummy data.");
+                
+                // 1. Simulate a 1-second network delay to feel real
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 2. Return a high-quality, hard-coded "dummy" compliment
+                return "Wow, that's truly impressive! Your dedication is amazing, and you should be incredibly proud of what you've accomplished. You're setting a great example for everyone!";
             }
+            // --- END NEW LOGIC ---
 
-            // This is the standard "payload" for the ChatGPT API
+            
+            // This 'real' API call code will now only run if a key is pasted in
+            // for local testing. It will NOT run on GitHub Pages.
             const payload = {
                 model: "gpt-3.5-turbo", // Good, fast, and cheap
                 messages: [
@@ -578,7 +594,8 @@
                     if (text) {
                         return text; // Success!
                     } else {
-                        throw new Error("No content in API response.");
+                        throw newE
+                        rror("No content in API response.");
                     }
 
                 } catch (error) {
@@ -594,14 +611,8 @@
         }
 
         // --- Start the app ---
-        // This one call kicks off the whole authentication process.
-        // We don't need the initialSignIn() function anymore,
-        // because onAuthStateChanged handles all cases.
-        // The listener is already set up, so it will fire.
+        // onAuthStateChanged is already set up and will fire, starting the app.
 
     </script>
 </body>
 </html>
-
-
-
