@@ -340,7 +340,10 @@
                 // --- PHASE 3: Unlock Pro Features ---
                 // 1. Set the dropdown's default value to their assigned style.
                 if (styleSelector) {
-                    styleSelector.value = currentUserStyle;
+                    // Check if the style exists before setting
+                    if (Array.from(styleSelector.options).some(o => o.value === currentUserStyle)) {
+                        styleSelector.value = currentUserStyle;
+                    }
                 }
 
                 // 2. If the user is 'pro', unlock the premium styles.
@@ -402,8 +405,8 @@
                 }
                 // --- END PHASE 3 ---
                 
-                // --- 4. Call Gemini API ---
-                const compliment = await callGeminiApi(query, systemPrompt);
+                // --- 4. Call OpenAI API ---
+                const compliment = await callOpenAiApi(query, systemPrompt);
                 
                 // Display result
                 outputText.textContent = compliment;
@@ -436,7 +439,7 @@
                 // --- END PHASE 1 ---
 
             } catch (error) {
-                console.error("Error from Gemini API:", error);
+                console.error("Error from OpenAI API:", error);
                 outputText.textContent = "Sorry, I'm feeling a bit uninspired. Please try again. " + error.message;
                 outputContainer.classList.remove('hidden');
             } finally {
@@ -534,27 +537,41 @@
             }
         }
 
-        // --- Helper: Call Gemini API ---
-        // This is the function that actually talks to the AI.
-        async function callGeminiApi(userQuery, systemPrompt, retries = 3, delay = 1000) {
-            // Note: The 'apiKey' and 'apiUrl' are provided by the environment.
-            // When you host this yourself, you'll need your own Gemini API key.
-            // *** This is our NEXT step. This key is still blank. ***
-            const apiKey = "AIzaSyDK0D9cHHIHVMDYAKb4V92ClaqA5we0N6w"; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        // --- Helper: Call OpenAI API (Replaced Gemini) ---
+        // This is the function that actually talks to ChatGPT.
+        async function callOpenAiApi(userQuery, systemPrompt, retries = 3, delay = 1000) {
+            
+            // *** PASTE YOUR CHATGPT API KEY (sk-...) HERE! ***
+            const openAiApiKey = ""; 
+            const apiUrl = "https://api.openai.com/v1/chat/completions";
 
+            if (!openAiApiKey) {
+                throw new Error("Missing OpenAI API Key. Please add it to index.html on line 551.");
+            }
+
+            // This is the standard "payload" for the ChatGPT API
             const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
+                model: "gpt-3.5-turbo", // Good, fast, and cheap
+                messages: [
+                    {
+                        role: "system",
+                        content: systemPrompt
+                    },
+                    {
+                        role: "user",
+                        content: userQuery
+                    }
+                ]
             };
 
             for (let i = 0; i < retries; i++) {
                 try {
                     const response = await fetch(apiUrl, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${openAiApiKey}` // This header is new!
+                        },
                         body: JSON.stringify(payload)
                     });
 
@@ -565,8 +582,8 @@
 
                     const result = await response.json();
                     
-                    // Extract the text from the response
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    // Extract the text from the response (different from Gemini)
+                    const text = result.choices?.[0]?.message?.content;
                     if (text) {
                         return text; // Success!
                     } else {
@@ -594,4 +611,3 @@
     </script>
 </body>
 </html>
-
