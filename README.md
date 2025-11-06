@@ -1,3 +1,7 @@
+<!-- File: /README.md -->
+
+<!-- This is the root file for your project. -->
+
 ⚡ KindZap.com
 
 Get an instant boost of kindness, powered by AI.
@@ -16,12 +20,26 @@ Free: Choose from "Witty" or "Wholesome" styles.
 
 Pro: Unlock premium styles like "Shakespearean," "Gen Z," and "Corporate."
 
-Tech Stack
+"Best in Class" Tech Stack
 
-This app is built with simple, powerful technologies, all contained in a single index.html file for easy hosting.
+This app is built with a professional, modular, and secure architecture.
 
-Frontend: HTML, Tailwind CSS, and vanilla JavaScript (ESM).
+Frontend: The UI is a clean index.html file, styled with Tailwind CSS.
+
+App Logic: The frontend logic is written in vanilla JavaScript (ESM) and is fully modular. It's broken down by "Separation of Concerns":
+
+/app.js: The main controller that manages state and events.
+
+/src/dom.js: A dedicated service for all UI updates.
+
+/src/firebase.js: A dedicated service for all Auth & Database logic.
+
+/src/api.js: A dedicated service for calling our backend.
+
+/src/config.js: A central file for all configuration.
 
 Backend (Database): Google Firebase (Firestore) is used to store user data, such as plan status (free/pro) and usage counts.
 
-AI: Google's Gemini API (gemini-2.5-flash-preview-09-2025) is used for all compliment generation.
+Backend (Secure AI): We use a Vercel Serverless Function (/api/getCompliment.js) to securely call the OpenAI API. This ensures our secret API key is never exposed to the browser.
+
+Hosting: The app is designed to be hosted on Vercel, which handles the static frontend, the secure backend function, and all environment variables.
