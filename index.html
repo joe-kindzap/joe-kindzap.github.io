@@ -156,7 +156,7 @@
         // We need 'auth' to sign users in (even anonymously).
         // We need 'firestore' for our "Magic Notebook" (the database).
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         /*
@@ -226,12 +226,15 @@
         const styleSelector = document.getElementById('style-selector');
 
         // --- Firebase Config and Init ---
-        // These are global variables provided by the environment we're in.
-        // When you host this yourself, you'll replace these with your own keys
-        // from your Firebase project.
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // These are YOUR personal keys from your new Firebase project.
+        const firebaseConfig = {
+          apiKey: "AIzaSyDwU2ezZgJKxVLBwD4FA7odorpzIHwPklI",
+          authDomain: "kindzap-project.firebaseapp.com",
+          projectId: "kindzap-project",
+          storageBucket: "kindzap-project.firebasestorage.app",
+          messagingSenderId: "1097934782133",
+          appId: "1:1097934782133:web:9d8faa8c992366a8ef08fc"
+        };
 
         // Initialize Firebase App and services
         const app = initializeApp(firebaseConfig);
@@ -246,8 +249,8 @@
         };
         let currentUserId = null;
         let currentUserStyle = 'wholesome'; // Default style
-        let userPlan = 'free';              // Default plan
-        let complimentCount = 0;            // Default count
+        let userPlan = 'free';           // Default plan
+        let complimentCount = 0;           // Default count
 
         
         /*
@@ -290,30 +293,14 @@
             }
         });
 
-        // This attempts to sign in. 
-        // If 'initialAuthToken' exists, it uses that. Otherwise, it triggers the
-        // 'onAuthStateChanged' listener which will then sign in anonymously.
-        async function initialSignIn() {
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else if (!auth.currentUser) {
-                    await signInAnonymously(auth);
-                }
-                // The onAuthStateChanged listener will handle the rest
-            } catch (error) {
-                console.error("Initial sign-in error:", error);
-                authStatus.textContent = "Error: Authentication failed.";
-            }
-        }
-
         // --- 2. Get User Configuration ---
         // This is where we read from our "Magic Notebook" (Firestore).
         async function getUserConfig() {
             if (!currentUserId) return;
 
             // This is the "page" in our notebook for this user's config.
-            const configRef = doc(db, `artifacts/${appId}/users/${currentUserId}/config`, 'main');
+            // *** NOTE: We updated this path to be simpler! ***
+            const configRef = doc(db, `users/${currentUserId}/config`, 'main');
             
             try {
                 const docSnap = await getDoc(configRef);
@@ -436,11 +423,12 @@
                     complimentCount++; // 1. Increment local count
                     
                     // 2. Save to Firebase "Magic Notebook"
-                    const configRef = doc(db, `artifacts/${appId}/users/${currentUserId}/config`, 'main');
+                    // *** NOTE: We updated this path to be simpler! ***
+                    const configRef = doc(db, `users/${currentUserId}/config`, 'main');
                     await setDoc(configRef, { 
                         complimentCount: complimentCount 
                     }, { merge: true }); // 'merge: true' is crucial.
-                                       // It only updates this one field.
+                                         // It only updates this one field.
 
                     // 3. Update UI
                     styleStatus.textContent = `Style Group: ${currentUserStyle} (Plan: ${userPlan}) (Count: ${complimentCount})`;
@@ -471,7 +459,8 @@
 
                 // 3. Update our Firebase "Magic Notebook"
                 // This is the "conversion"! We just change 'plan' to 'pro'.
-                const configRef = doc(db, `artifacts/${appId}/users/${currentUserId}/config`, 'main');
+                // *** NOTE: We updated this path to be simpler! ***
+                const configRef = doc(db, `users/${currentUserId}/config`, 'main');
                 await setDoc(configRef, { 
                     plan: 'pro' 
                 }, { merge: true });
@@ -550,6 +539,7 @@
         async function callGeminiApi(userQuery, systemPrompt, retries = 3, delay = 1000) {
             // Note: The 'apiKey' and 'apiUrl' are provided by the environment.
             // When you host this yourself, you'll need your own Gemini API key.
+            // *** This is our NEXT step. This key is still blank. ***
             const apiKey = ""; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
@@ -569,6 +559,7 @@
                     });
 
                     if (!response.ok) {
+                        // This will now be our main error!
                         throw new Error(`API Error: ${response.status} ${response.statusText}`);
                     }
 
@@ -596,7 +587,9 @@
 
         // --- Start the app ---
         // This one call kicks off the whole authentication process.
-        initialSignIn();
+        // We don't need the initialSignIn() function anymore,
+        // because onAuthStateChanged handles all cases.
+        // The listener is already set up, so it will fire.
 
     </script>
 </body>
